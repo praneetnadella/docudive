@@ -1,0 +1,57 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt  # Change if you use another package manager
+
+      - name: Install frontend dependencies
+        run: |
+          cd client
+          npm install
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          pytest tests  # Modify if using another test framework
+
+      - name: Run frontend tests
+        run: |
+          cd client
+          npm test
+
+      - name: Lint Python Code
+        run: |
+          cd backend
+          flake8 .  # Change based on your linter
+
+      - name: Lint JavaScript Code
+        run: |
+          cd client
+          npm run lint
