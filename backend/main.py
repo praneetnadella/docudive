@@ -18,15 +18,23 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        index.delete(deleteAll=True)
-        logger.info("Pinecone index cleared on startup.")
+        try:
+            index.delete(deleteAll=True)
+            logger.info("Pinecone index cleared on startup.")
+        except Exception as e:
+            if "Namespace not found" in str(e):
+                logger.info(f"Pinecone index '{INDEX_NAME}' does not exist yet, skipping deletion.")
+            else:
+                logger.error(f"Error clearing Pinecone index: {e}")
     except Exception as e:
-        logger.error(f"Error clearing Pinecone index: {e}")
+        logger.error(f"Error checking or clearing Pinecone index: {e}")
     yield
-
+    
 app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(

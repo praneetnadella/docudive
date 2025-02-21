@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import logging
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 logging.info("Initializing Pinecone...")
 
